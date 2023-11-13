@@ -1,0 +1,7 @@
+port=8000
+
+auth_callback_path = ["/auth/callback"]
+webhooks_path = "/api/webhooks"
+
+[commands]
+dev = "php artisan serve"

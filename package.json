@@ -1,0 +1,35 @@
+{
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "shopify": "shopify",
+        "info": "shopify app info",
+        "generate": "shopify app generate",
+        "deploy": "shopify app deploy"
+    },
+    "devDependencies": {
+        "@shopify/app": "^3",
+        "@shopify/cli": "^3",
+        "@vitejs/plugin-react": "^4.0.4",
+        "axios": "^1.1.2",
+        "laravel-vite-plugin": "^0.8.0",
+        "vite": "^4.0.0"
+    },
+    "dependencies": {
+        "@formatjs/intl-locale": "^3.3.3",
+        "@formatjs/intl-localematcher": "^0.4.1",
+        "@formatjs/intl-pluralrules": "^5.2.5",
+        "@shopify/app-bridge": "^3.7.9",
+        "@shopify/app-bridge-react": "^3.7.9",
+        "@shopify/i18next-shopify": "^0.2.4",
+        "@shopify/polaris": "^11.16.0",
+        "i18next-resources-to-backend": "^1.1.4",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "react-i18next": "^13.2.2",
+        "react-query": "^3.39.3",
+        "react-router-dom": "^6.15.0"
+    }
+}
