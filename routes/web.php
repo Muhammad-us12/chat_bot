@@ -2,6 +2,11 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OAuthController;
+use App\Http\Controllers\Product\ProductGroupController;
+
+Route::group(['middleware' => ['shopify.auth']], function () {
+    Route::post('/create-product-group', [ProductGroupController::class, 'create']);
+});
 
 Route::view('/login', 'login')->name('auth.login');
 Route::get('/auth/begin', [OAuthController::class, 'begin'])->name('auth.begin');

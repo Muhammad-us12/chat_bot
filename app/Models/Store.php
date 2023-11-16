@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Domain\Bargain\Entities\ProductGroup;
 use App\Clients\Shopify\Client;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
@@ -29,5 +30,10 @@ class Store extends Model implements AuthenticatableContract
     public function hasValidAccessToken(): bool
     {
         return $this->shopifyClient()->isAccessTokenWorking();
+    }
+
+    public function productGroups()
+    {
+        return $this->hasMany(ProductGroup::class,'store_id');
     }
 }
