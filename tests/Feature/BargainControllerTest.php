@@ -25,7 +25,7 @@ class BargainControllerTest extends TestCase
             'product_group_id' => $productGroup->id,
         ];
 
-        $res = $this->actingAs($store)->post('/create-bargain', $payload);
+        $res = $this->actingAs($store)->post('bargain', $payload);
         $res->assertCreated();
         $this->assertDatabaseHas('bargains', ['value' => 2, 'product_group_id' => $productGroup->id]);
     }
@@ -41,7 +41,7 @@ class BargainControllerTest extends TestCase
             'product_group_id' => $productGroup->id,
         ];
 
-        $res = $this->actingAs($store)->post('/create-bargain', $payload);
+        $res = $this->actingAs($store)->post('bargain', $payload);
 
         $res->assertCreated();
         $this->assertDatabaseHas('bargains', ['value' => 2.2, 'product_group_id' => $productGroup->id]);

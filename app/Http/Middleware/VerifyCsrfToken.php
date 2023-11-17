@@ -8,8 +8,8 @@ class VerifyCsrfToken extends Middleware
 {
   
     protected $except = [
-        '*/create-product-group',
-        '*/add-product/*',
-        '*/create-bargain'
+        '*/product-group',
+        '*/product/*',
+        '*/bargain'
     ];
 }

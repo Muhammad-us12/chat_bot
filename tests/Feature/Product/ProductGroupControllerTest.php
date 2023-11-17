@@ -26,7 +26,7 @@ class ProductGroupControllerTest extends TestCase
             'name' => 'Group 1',
         ];
 
-        $response = $this->actingAs($store)->post('/create-product-group', $payload);
+        $response = $this->actingAs($store)->post('/product-group', $payload);
 
         $response->assertOk();
         $this->assertDatabaseHas(ProductGroup::class, ['store_id' => $store->id, 'type' => $payload['type']]);
@@ -46,7 +46,7 @@ class ProductGroupControllerTest extends TestCase
             'name' => $this->faker()->words(3, true)
         ];
         // dd($productGroup->id);
-        $response = $this->actingAs($store)->post("add-product/".$productGroup->id."", $payload);
+        $response = $this->actingAs($store)->post("product/".$productGroup->id."", $payload);
         // dd($response);
         $response->assertOk();
         $this->assertDatabaseHas(Product::class, ['shopify_id' => $payload['shopify_id']]);
