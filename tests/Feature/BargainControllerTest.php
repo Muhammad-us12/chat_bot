@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Domain\Bargain\Entities\Bargain;
 use App\Models\Store;
 use Domain\Bargain\Entities\ProductGroup;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -45,5 +46,17 @@ class BargainControllerTest extends TestCase
 
         $res->assertCreated();
         $this->assertDatabaseHas('bargains', ['value' => 2.2, 'product_group_id' => $productGroup->id]);
+    }
+
+    public function testDeleteBargain()
+    {
+        $store = Store::factory()->create();
+        $productGroup = ProductGroup::factory()->for($store)->create();
+        $bargain = Bargain::factory()->for($productGroup)->create();
+
+        $res = $this->actingAs($store)->delete("bargain/{$bargain->id}");
+
+        $res->assertCreated();
+        $this->assertDatabaseMissing('bargains', ['id' => $bargain->id, 'product_group_id' => $productGroup->id]);
     }
 }

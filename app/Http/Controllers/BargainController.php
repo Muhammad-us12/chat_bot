@@ -26,4 +26,16 @@ class BargainController extends Controller
             'data' => []
         ], 201);
     }
+
+    public function delete(Bargain $bargain)
+    {
+        $productGroupAggregate = new ProductGroupAggregate($bargain->productGroup);
+        $productGroupAggregate->removeBargainRule();
+
+        return \response()->json([
+            'error' => false,
+            'msg' => 'Bargain rule deleted successfully',
+            'data' => []
+        ], 201);
+    }
 }
