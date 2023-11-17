@@ -29,6 +29,9 @@ class Store extends Model implements AuthenticatableContract
 
     public function hasValidAccessToken(): bool
     {
+        if (app()->environment('local')) {
+           return true;
+        }        
         return $this->shopifyClient()->isAccessTokenWorking();
     }
 

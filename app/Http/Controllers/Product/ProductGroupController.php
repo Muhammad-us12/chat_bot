@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Product;
 use Domain\Bargain\Actions\CreateProductGroup;
 use App\Models\User;
 use App\Models\Store;
+use Domain\Bargain\Entities\Product;
+use Domain\Bargain\Entities\ProductGroup;
 use App\Http\Controllers\Controller;
 use Domain\Bargain\Enums\ProductGroupType;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-
+use Domain\Bargain\Aggregates\ProductGroupAggregate;
 
 class ProductGroupController extends Controller
 {
@@ -30,5 +32,20 @@ class ProductGroupController extends Controller
             'msg' => 'Group created successfully',
             'data' => []
         ]);
+    }
+
+    public function addProduct(Request $request, ProductGroup $group)
+    {
+        // dd($group);
+
+        $requestParams = $request->validate([
+            'shopify_id' => ['numeric', 'required'],
+            'name' => ['string', 'required'],
+        ]);
+        $product = new Product(['product_group_id' => $group->id] + $requestParams);
+       
+        $productGroupAggregate = new ProductGroupAggregate($group);
+        // dd($productGroupAggregate);
+        $productGroupAggregate->addProduct($product);
     }
 }

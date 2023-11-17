@@ -5,7 +5,8 @@ use App\Http\Controllers\OAuthController;
 use App\Http\Controllers\Product\ProductGroupController;
 
 Route::group(['middleware' => ['shopify.auth']], function () {
-    Route::post('/create-product-group', [ProductGroupController::class, 'create']);
+    Route::post('create-product-group', [ProductGroupController::class, 'create']);
+    Route::post('add-product/{group}', [ProductGroupController::class, 'addProduct']);
 });
 
 Route::view('/login', 'login')->name('auth.login');

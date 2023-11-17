@@ -21,6 +21,7 @@ class AuthenticateShopifyStore
      */
     public function handle(Request $request, Closure $next): Response
     {
+        
         $bearerPresent = preg_match("/Bearer (.*)/", $request->header('Authorization', ''), $bearerMatches);
         \abort_if(!$bearerMatches, 401);
 
@@ -31,11 +32,13 @@ class AuthenticateShopifyStore
 
         // Getting store from database.
         $store = Store::where('name', $shop)->first();
-
+        // dd($store->hasValidAccessToken());
         if ($store && $store->hasValidAccessToken()) {
             $request->attributes->set('store', $store);
             return $next($request);
         }
+
+        
         // This response thing needs to be tested, and see the working of these headers in frontend react hook.
         return response('', 401, [
             self::REDIRECT_HEADER => '1',

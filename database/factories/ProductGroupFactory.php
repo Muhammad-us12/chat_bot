@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use Domain\Bargain\Entities\ProductGroup;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -9,11 +10,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class ProductGroupFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
+    protected $model = ProductGroup::class;
+
     public function definition(): array
     {
         return [

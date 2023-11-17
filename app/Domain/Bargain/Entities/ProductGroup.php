@@ -3,6 +3,7 @@
 namespace Domain\Bargain\Entities;
 
 use App\Models\User;
+use App\Models\Store;
 use Illuminate\Database\Eloquent\Model;
 use App\Domain\Bargain\Entities\Bargain;
 use Database\Factories\ProductGroupFactory;
@@ -25,9 +26,9 @@ class ProductGroup extends Model
         return ProductGroupFactory::new();
     }
 
-    public function user(): BelongsTo
+    public function store()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Store::class);
     }
 
     public function products(): HasMany
