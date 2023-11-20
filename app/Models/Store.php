@@ -39,4 +39,14 @@ class Store extends Model implements AuthenticatableContract
     {
         return $this->hasMany(ProductGroup::class,'store_id');
     }
+
+    public function customers()
+    {
+        return $this->hasMany(Customer::class);
+    }
+
+    public function priceBeatOffers()
+    {
+        return $this->hasMany(PriceBeatOffer::class);
+    }
 }

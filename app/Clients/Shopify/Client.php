@@ -21,6 +21,21 @@ class Client
         ])->acceptJson()->retry(3, 30)->throw()->baseUrl($baseUrl);
     }
 
+    public function getClientVersion(){
+        return $this->version;
+    }
+
+    public function getVariant(string $variantId): array
+    {   
+        return $this->http->get("/variants/{$variantId}.json")->json('variant');
+    }
+
+    public function getProduct(string $productId): array
+    {
+        return $this->http->get("/products/{$productId}.json")->json('product');
+    }
+
+
     public static function fetchAccessToken(string $shopAddress, string $code): array
     {
         $payload = [

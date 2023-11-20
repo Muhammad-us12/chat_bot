@@ -3,6 +3,7 @@
 use App\Http\Controllers\BargainController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OAuthController;
+use App\Http\Controllers\PriceBeatController;
 use App\Http\Controllers\Product\ProductGroupController;
 
 Route::group(['middleware' => ['shopify.auth']], function () {
@@ -10,6 +11,7 @@ Route::group(['middleware' => ['shopify.auth']], function () {
     Route::post('product/{group}', [ProductGroupController::class, 'addProduct']);
     Route::post('bargain', [BargainController::class, 'create']);
     Route::delete('bargain/{bargain}', [BargainController::class, 'delete']);
+    Route::post('/price-beat-offer', [PriceBeatController::class, 'create']);
 });
 
 Route::view('/login', 'login')->name('auth.login');
