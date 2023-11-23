@@ -12,6 +12,8 @@ class VerifyCsrfToken extends Middleware
         '*/product/*',
         '*/bargain',
         '*/bargain/*',
-        '*/price-beat-offer'
+        '*/price-beat-offer',
+        '*/offer',
+        '*/variant-discount/*'
     ];
 }

@@ -5,6 +5,10 @@ namespace App\Clients\Shopify;
 use App\Models\Store;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Client\PendingRequest;
+use App\Clients\Objects\GraphQl\GetAProduct;
+use App\Clients\Objects\GraphQl\GetProducts;
+use App\Clients\Objects\GraphQl\CreateACustomer;
+use App\Clients\Objects\GraphQl\GetProductVariant;
 
 class Client
 {
@@ -35,6 +39,20 @@ class Client
         return $this->http->get("/products/{$productId}.json")->json('product');
     }
 
+    public function createCustomer($customer): array
+    {
+        return $this->http->post("unstable/customers.json",['customer'=>$customer])->json('customer');
+    }
+
+    public function createPriceRule($priceRule)
+    {
+        return $this->http->post("price_rules.json",['price_rule'=>$priceRule])->json('price_rule');   
+    }
+
+    public function createDiscountCode($priceRuleId,$discountCodePayloads)
+    {
+        return $this->http->post("price_rules/{$priceRuleId}/discount_codes.json",['discount_code'=>$discountCodePayloads])->json('discount_code');   
+    }
 
     public static function fetchAccessToken(string $shopAddress, string $code): array
     {

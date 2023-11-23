@@ -9,7 +9,7 @@ class Customer extends Model
 {
     use HasFactory;
     
-    protected $fillable = ['user_id', 'name', 'email', 'country', 'city', 'browser', 'os'];
+    protected $fillable = ['user_id', 'name', 'email', 'country', 'city', 'browser', 'os','shopify_id','offer_count'];
 
     public function offers()
     {
@@ -24,6 +24,11 @@ class Customer extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function customerOffered()
+    {
+        return $this->hasMany(Offer::class,'customer_id');
     }
 
 

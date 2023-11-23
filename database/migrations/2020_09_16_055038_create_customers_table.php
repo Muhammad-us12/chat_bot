@@ -22,6 +22,9 @@ class CreateCustomersTable extends Migration
             $table->string('city')->nullable();
             $table->string('browser')->nullable();
             $table->string('os')->nullable();
+            $table->string('shopify_id')->nullable();
+            $table->integer('offer_count')->default(0);
+            
             $table->timestamps();
         });
     }
