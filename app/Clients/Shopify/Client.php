@@ -9,10 +9,11 @@ use App\Clients\Objects\GraphQl\GetAProduct;
 use App\Clients\Objects\GraphQl\GetProducts;
 use App\Clients\Objects\GraphQl\CreateACustomer;
 use App\Clients\Objects\GraphQl\GetProductVariant;
+use App\Clients\Objects\GraphQl\CreatePriceRuleAndGetDiscountCode;
 
 class Client
 {
-    private string $version = "2023-07";
+    private string $version = "2023-10";
     private PendingRequest $http;
 
 
@@ -169,4 +170,38 @@ class Client
     {
         return $this->http->get('/shop.json')->json();
     }
+
+    public function graphQlRequestExecute($query)
+    {
+        return $this->http->post("graphql.json", ['query' => "$query"])->json();
+    }
+
+    public function getProductWithGraphQl(string $productId): array
+    {
+        $getProductQuery = new GetAProduct($productId);
+        
+        return $this->graphQlRequestExecute($getProductQuery);
+    }
+
+    public function getVariantWithGraphQl(string $variantId): array
+    {   
+        $getProductVariantQuery = new GetProductVariant($variantId);
+
+        return $this->graphQlRequestExecute($getProductVariantQuery);
+    }
+
+    public function createCustomerWithGraphQl($email): array
+    {
+        $createCustomerQuery = new createACustomer($email);
+
+        return $this->graphQlRequestExecute($createCustomerQuery);
+    }
+
+    public function createPriceRuleAndGetDiscountCodeGraphQl($value, $variantId, $customerShopifyId){
+        $priceRuleQuery = new CreatePriceRuleAndGetDiscountCode($value,$variantId,$customerShopifyId);
+        
+        return $this->graphQlRequestExecute($priceRuleQuery);
+    }
+
+    
 }

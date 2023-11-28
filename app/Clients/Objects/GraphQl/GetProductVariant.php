@@ -10,16 +10,16 @@ class GetProductVariant
     public function __construct( string $variantId)
     {
         $this->query = '{
-        productVariant(id:"'.$variantId.'") {
-        id
-        title
-    price
-    product{
-    id
-    }
-  }
-}
-        ';
+                            productVariant(id:"'.$variantId.'") {
+                                id
+                                title
+                                price
+                                product{
+                                    id
+                                }
+                            }
+                        }';
+        return $this->query;
     }
 
     public function __toString()

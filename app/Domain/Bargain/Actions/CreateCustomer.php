@@ -23,6 +23,7 @@ class CreateCustomer
         $os = $this->getCustomerOs();
         
         $customerLocationInfo = $this->ipLocate->getLocation($ip);
+        // $customerLocationInfo = [];
         return $store->customers()->save(new Customer([
             'country' => $customerLocationInfo['country'] ?? null,
             'city' => $customerLocationInfo['city'] ?? null,

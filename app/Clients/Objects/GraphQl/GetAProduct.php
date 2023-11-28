@@ -9,24 +9,26 @@ class GetAProduct
     public function __construct(string $productId)
     {
         $this->query = '
-         query FetchingProduct($variantCount:Int = 100,$id:ID="' . $productId . '"){
-        product(id:$id){
-         id
-         title
-         handle
-         vendor
-         tags
-         variants(first:$variantCount){
-           edges{
-             node{
-               id
-               displayName
-               price
-        }
-      }
-    }
-  }
-}';
+        query FetchingProduct($variantCount: Int = 100, $id: ID = "'.$productId.'") {
+            product(id: $id) {
+              id
+              title
+              handle
+              vendor
+              tags
+              variants(first: $variantCount) {
+                edges {
+                  node {
+                    id
+                    displayName
+                    price
+                  }
+                }
+              }
+            }
+          }';
+
+          return $this->query;
     }
 
     public function __toString()
