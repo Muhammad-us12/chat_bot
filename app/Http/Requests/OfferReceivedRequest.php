@@ -29,8 +29,8 @@ class OfferReceivedRequest extends FormRequest
             'email' => 'required|email',
             'variant_offered_amount' => 'required|numeric',
             'variant_actual_amount' => 'required|numeric',
-            'variant_id' => 'string|required',
-            'product_id' => 'string|required',
+            'variant_id' => 'required',
+            'product_id' => 'required',
             'browser' => 'required|string',
             'operating_system' => 'required|string',
             'store_name' => 'required|string'
@@ -50,11 +50,11 @@ class OfferReceivedRequest extends FormRequest
             throw ValidationException::withMessages(['product_id' => 'No product associated with this product ID']);
         }
         $productVariant = $shopify->getVariant($this->get('variant_id'));
-       
+
         if ($productVariant === null) {
             throw ValidationException::withMessages(['variant_id' => 'No variant associated with this variant ID']);
         }
-        if ($product['id'] !== $productVariant['product']['id']) {
+        if ($product['id'] !== $productVariant['product_id']) {
             throw ValidationException::withMessages(['product_id' => 'This variant doesnot belongs to the product']);
         }
         if ($productVariant['price'] != $this->get('variant_actual_amount')) {

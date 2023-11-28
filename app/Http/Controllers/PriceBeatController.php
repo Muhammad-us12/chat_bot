@@ -19,13 +19,9 @@ class PriceBeatController extends Controller
         ]);
 
         $priceBeatRequestParams['ip'] = $request->ip();
-        // TODO > Check if the offer can be auto approved. (Will determine the status of the offer.) 
-        // could be done in sperate action (EvaluatePriceBeatOffer)
-        // TODO > Data being returned after parsing is not normalized, key do differ from different html sources.
-        
+       
         $store = $request->get('store');
-        /** @var User */
-        // $user = Auth::user();
+        
         try {
             $store->shopifyClient()->getVariant($priceBeatRequestParams['variant_id']);
         } catch (RequestException $e) {

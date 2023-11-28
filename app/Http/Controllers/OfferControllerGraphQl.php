@@ -23,7 +23,6 @@ class OfferControllerGraphQl extends Controller
         $customer = $this->getOrCreateCustomer($store, $request, $shopify);
         if ($customer->hasOffered($request['product_id'], $request['variant_id'], $store) == false) {
             
-            
             $customerOffers = Offer::create([
                 'customer_id' => $customer['id'],
                 'variant_id' => $request['variant_id'],
@@ -43,7 +42,6 @@ class OfferControllerGraphQl extends Controller
             if ($this->checkforTagDiscount($request['product_id'], $shopify, $request['variant_actual_amount'], $request['variant_offered_amount'], $offer) == true) {
                 return response()->json(['error' => false, 'message' => 'Your offer has been created successfully'], 200);
             }
-            // event(new OfferReceivedEvent($request['email'], 'pending'));
 
             return response()->json(['error' => false, 'message' => 'Your offer has been created successfully'], 200);
         }

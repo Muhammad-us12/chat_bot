@@ -20,7 +20,7 @@ class OfferController extends Controller
         $store = Store::where('name', $request['store_name'])->first();
         $customer = $this->getOrCreateCustomer($store, $request, $shopify);
         if ($customer->hasOffered($request['product_id'], $request['variant_id'], $store) == false) {
-            $customerOffers = Offer::create([
+            $offer = Offer::create([
                 'customer_id' => $customer['id'],
                 'variant_id' => $request['variant_id'],
                 'variant_name' => $request['variant_name'],
@@ -32,14 +32,13 @@ class OfferController extends Controller
                 'status' => 'pending',
             ]);
            
-            if ($this->autoPriceCheck($store,$request['variant_offered_amount'], $request['variant_actual_amount'], $request['variant_id'], $customerOffers, $shopify) == true) {
+            if ($this->autoPriceCheck($store,$request['variant_offered_amount'], $request['variant_actual_amount'], $request['variant_id'], $offer, $shopify) == true) {
                 return response()->json(['error' => false, 'message' => 'Your offer has been created successfully'], 200);
             }
 
             if ($this->checkforTagDiscount($request['product_id'], $shopify, $request['variant_actual_amount'], $request['variant_offered_amount'], $offer) == true) {
                 return response()->json(['error' => false, 'message' => 'Your offer has been created successfully'], 200);
             }
-            // event(new OfferReceivedEvent($request['email'], 'pending'));
 
             return response()->json(['error' => false, 'message' => 'Your offer has been created successfully'], 200);
         }
@@ -65,7 +64,6 @@ class OfferController extends Controller
             ];
             
             $shopifyCustomer = $shopify->createCustomer($customerData);
-            // dd($shopifyCustomer);
             if (!empty($request->ip())) {            
                 return $customer = $createCustomer->execute($store,$request['username'],$request['email'],$request->ip(),$shopifyCustomer['id'],1);
             } else {
@@ -153,7 +151,6 @@ class OfferController extends Controller
             $discountCode = $shopify->createDiscountCode($priceRule['id'],$discountCodePayloads);
             $this->storeDiscountCode($offer, $discountCode['code']);
             $url = env('APP_URL').'/checkout?product='.$offer['product_name'].'&variant='.$offer['variant_name'].'&shop='.$store['name'].'&code='.$discountCode['code'].'&customerId='.$customer['id'];
-            // event(new OfferApprovedEvent($customer['email'], $priceRule['code'], $url));
             $offer->approve();
 
             return true;

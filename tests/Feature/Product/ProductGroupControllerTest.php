@@ -34,20 +34,14 @@ class ProductGroupControllerTest extends TestCase
 
     public function testAddProductToAGroup()
     {
-        Http::fake([
-            "*.myshopify.com/*" => Http::response(['i am response'])
-        ]);
         $store = Store::factory()->create();
-        
         $productGroup = ProductGroup::factory()->for($store)->create(['type' => 'custom']);
         
         $payload = [
             'shopify_id' => 923874923,
             'name' => $this->faker()->words(3, true)
         ];
-        // dd($productGroup->id);
         $response = $this->actingAs($store)->post("product/".$productGroup->id."", $payload);
-        // dd($response);
         $response->assertOk();
         $this->assertDatabaseHas(Product::class, ['shopify_id' => $payload['shopify_id']]);
     }

@@ -23,7 +23,6 @@ class ProductGroupController extends Controller
         ]);
 
         
-        
         $store = Store::firstWhere('name', $request->get('store')->name);
         $createProductGroup->execute($store, $requestParams['name'], ProductGroupType::from($requestParams['type']));
 
@@ -36,16 +35,20 @@ class ProductGroupController extends Controller
 
     public function addProduct(Request $request, ProductGroup $group)
     {
-        // dd($group);
-
         $requestParams = $request->validate([
             'shopify_id' => ['numeric', 'required'],
             'name' => ['string', 'required'],
         ]);
         $product = new Product(['product_group_id' => $group->id] + $requestParams);
-       
         $productGroupAggregate = new ProductGroupAggregate($group);
-        // dd($productGroupAggregate);
-        $productGroupAggregate->addProduct($product);
+        $result = $productGroupAggregate->addProduct($product);
+        if($result){
+            return \response()->json([
+                'error' => false,
+                'msg' => 'Product Added successfully',
+                'data' => []
+            ]);
+        }
+
     }
 }

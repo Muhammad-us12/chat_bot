@@ -17,7 +17,6 @@ class ProductGroupAggregate
 
     public function addProduct(Product $product): bool
     {
-        // dd($this->productGroup);
         if (ProductGroupType::from($this->productGroup->type) != ProductGroupType::CUSTOM) {
             return false;
         }
