@@ -10,6 +10,7 @@ use App\Models\Offer;
 use App\Models\VariantDiscount;
 use App\Models\Customer;
 use App\Clients\IpLocate\IpLocation;
+use App\Events\OfferReceivedEvent;
 use App\Models\DiscountCode;
 use Illuminate\Http\Request;
 
@@ -33,12 +34,13 @@ class OfferController extends Controller
             ]);
            
             if ($this->autoPriceCheck($store,$request['variant_offered_amount'], $request['variant_actual_amount'], $request['variant_id'], $offer, $shopify) == true) {
-                return response()->json(['error' => false, 'message' => 'Your offer has been created successfully'], 200);
+                return response()->json(['error' => false, 'message' => 'Your offer has been accepted'], 200);
             }
 
             if ($this->checkforTagDiscount($request['product_id'], $shopify, $request['variant_actual_amount'], $request['variant_offered_amount'], $offer) == true) {
-                return response()->json(['error' => false, 'message' => 'Your offer has been created successfully'], 200);
+                return response()->json(['error' => false, 'message' => 'Your offer has been accepted'], 200);
             }
+            event(new OfferReceivedEvent($request['email'], 'pending'));
 
             return response()->json(['error' => false, 'message' => 'Your offer has been created successfully'], 200);
         }

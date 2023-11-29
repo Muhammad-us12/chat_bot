@@ -7,10 +7,12 @@ use App\Clients\Shopify\Client;
 use App\Http\Requests\OfferReceivedGraphQlRequest;
 use Domain\Bargain\Actions\CreateCustomer;
 use App\Models\Store;
+use App\Models\TagDiscount;
 use App\Models\Offer;
 use App\Models\VariantDiscount;
 use App\Models\Customer;
 use App\Clients\IpLocate\IpLocation;
+use App\Events\OfferReceivedEvent;
 use App\Models\DiscountCode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,7 +25,7 @@ class OfferControllerGraphQl extends Controller
         $customer = $this->getOrCreateCustomer($store, $request, $shopify);
         if ($customer->hasOffered($request['product_id'], $request['variant_id'], $store) == false) {
             
-            $customerOffers = Offer::create([
+            $offer = Offer::create([
                 'customer_id' => $customer['id'],
                 'variant_id' => $request['variant_id'],
                 'variant_name' => $request['variant_name'],
@@ -35,13 +37,15 @@ class OfferControllerGraphQl extends Controller
                 'status' => 'pending',
             ]);
 
-            if ($this->autoPriceCheck($store,$request['variant_offered_amount'], $request['variant_actual_amount'], $request['variant_id'], $customerOffers, $shopify) == true) {
-                return response()->json(['error' => false, 'message' => 'Your offer has been created successfully'], 200);
+            if ($this->autoPriceCheck($store,$request['variant_offered_amount'], $request['variant_actual_amount'], $request['variant_id'], $offer, $shopify) == true) {
+                return response()->json(['error' => false, 'message' => 'Your offer has been accepted'], 200);
             }
 
-            if ($this->checkforTagDiscount($request['product_id'], $shopify, $request['variant_actual_amount'], $request['variant_offered_amount'], $offer) == true) {
-                return response()->json(['error' => false, 'message' => 'Your offer has been created successfully'], 200);
+            if ($this->checkforTagDiscount($request['product_id'], $shopify, $request['variant_actual_amount'], $request['variant_offered_amount'], $offer,$store) == true) {
+                return response()->json(['error' => false, 'message' => 'Your offer has been accepted'], 200);
             }
+
+            event(new OfferReceivedEvent($request['email'], 'pending'));
 
             return response()->json(['error' => false, 'message' => 'Your offer has been created successfully'], 200);
         }
@@ -159,5 +163,27 @@ class OfferControllerGraphQl extends Controller
             'shopify_id' => $offer['customer_id'],
             'code' => $code,
         ]);
+    }
+
+    public function checkforTagDiscount($productId, Client $shopify, $actualAmount, $offeredAmount, $offer,$store)
+    {
+        $shopify = app(Client::class, ['store' => $store]);
+        $product = $shopify->getProductWithGraphQl($productId);
+
+        if (count($product['data']['product']['tags']) > 0) {
+            foreach ($product['data']['product']['tags'] as $tag) {
+                if (TagDiscount::where('product_id', (int) substr($productId, strpos($productId, 't/') + 2))->where('tag_name', $tag)->exists()) {
+                    if ($offeredAmount <= $this->getTagDiscountValue($actualAmount, $productId, $tag)) {
+                        if ($this->canAcceptOffer($store,$offer, $shopify) == true) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 }

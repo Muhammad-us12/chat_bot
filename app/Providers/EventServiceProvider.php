@@ -11,7 +11,11 @@ class EventServiceProvider extends ServiceProvider
      *
      * @var array<class-string, array<int, class-string>>
      */
-    protected $listen = [];
+    protected $listen = [
+        OfferApprovedEvent::class => [OfferApprovedListener::class],
+        OfferDeniedEvent::class => [OfferDeniedListener::class],
+        OfferReceivedEvent::class => [OfferReceivedListener::class],
+    ];
 
     /**
      * Register any events for your application.

@@ -53,6 +53,6 @@ class OfferControllerTest extends TestCase
         $this->assertDatabaseHas('customers', ['name' => 'usama', 'email' => 'usama@gmail.com', 'shopify_id' =>$customer_shop['shopify_id'] ]);
         $this->assertDatabaseHas('offers', ['customer_id' => Customer::first()['id'], 'variant_id' => $fakeProduct['variants'][0]['id'], 'variant_name' => $fakeProduct['variants'][0]['title'], 'product_id' => $fakeProduct['id'], 'variant_offered_amount' => $payload['variant_offered_amount'], 'variant_actual_amount' => $payload['variant_actual_amount']]);
         $response->assertStatus(200);
-        $this->assertEquals('Your offer has been created successfully', $response['message']);
+        $this->assertEquals('Your offer has been accepted', $response['message']);
     }
 }

@@ -59,12 +59,9 @@ class OfferReceivedGraphQlRequest extends FormRequest
         if ($productVariant === null) {
             throw ValidationException::withMessages(['variant_id' => 'No variant associated with this variant ID']);
         }
-
-
         if ($product['id'] !== $productVariant['product']['id']) {
             throw ValidationException::withMessages(['product_id' => 'This variant doesnot belongs to the product']);
         }
-        
         if ($productVariant['price'] != $this->get('variant_actual_amount')) {
             throw ValidationException::withMessages(['variant_actual_amount' => 'Variant\'s actual amount is different']);
         }
