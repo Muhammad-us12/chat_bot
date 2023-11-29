@@ -23,7 +23,7 @@ class CreateOffersTable extends Migration
             $table->integer('store_id');
             $table->float('variant_offered_amount',15);
             $table->float('variant_actual_amount',15);
-            $table->enum('status', ['pending', 'denied', 'accepted']);
+            $table->enum('status', ['pending', 'denied', 'Approved']);
             $table->integer('enable_offer')->nullable();
             $table->timestamps();
         });

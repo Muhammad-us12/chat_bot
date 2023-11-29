@@ -37,14 +37,13 @@ class OfferControllerGraphQl extends Controller
                 'status' => 'pending',
             ]);
 
-            if ($this->autoPriceCheck($store,$request['variant_offered_amount'], $request['variant_actual_amount'], $request['variant_id'], $offer, $shopify) == true) {
+              
+            if ($this->autoPriceCheck($store,$request['variant_offered_amount'], $request['variant_actual_amount'], $request['variant_id'], $offer, $shopify)) {
                 return response()->json(['error' => false, 'message' => 'Your offer has been accepted'], 200);
             }
-
-            if ($this->checkforTagDiscount($request['product_id'], $shopify, $request['variant_actual_amount'], $request['variant_offered_amount'], $offer,$store) == true) {
+            if ($this->checkforTagDiscount($request['product_id'], $shopify, $request['variant_actual_amount'], $request['variant_offered_amount'], $offer,$store)) {
                 return response()->json(['error' => false, 'message' => 'Your offer has been accepted'], 200);
             }
-
             event(new OfferReceivedEvent($request['email'], 'pending'));
 
             return response()->json(['error' => false, 'message' => 'Your offer has been created successfully'], 200);
@@ -169,7 +168,7 @@ class OfferControllerGraphQl extends Controller
     {
         $shopify = app(Client::class, ['store' => $store]);
         $product = $shopify->getProductWithGraphQl($productId);
-
+        
         if (count($product['data']['product']['tags']) > 0) {
             foreach ($product['data']['product']['tags'] as $tag) {
                 if (TagDiscount::where('product_id', (int) substr($productId, strpos($productId, 't/') + 2))->where('tag_name', $tag)->exists()) {
@@ -185,5 +184,38 @@ class OfferControllerGraphQl extends Controller
         }
 
         return false;
+    }
+
+    public function getTagDiscountValue($actualAmount, $productId, $tag)
+    {
+        $tagDiscount = TagDiscount::where('product_id', (int) substr($productId, strpos($productId, 't/') + 2))->where('tag_name', $tag)->first();
+
+        return $this->getPercentageValue($actualAmount, $tagDiscount['discount_percentage']);
+    }
+
+    public function getAllOffers(){
+        $allOffers = \App\Models\Offer::all();
+
+        return response()->json([
+            'error' => false,
+            'data' => [
+                'offers' => $allOffers
+            ]
+        ]);
+    }
+
+    public function getOffer(Offer $offer, Client $shopify)
+    {
+        $store = Store::where('id', $offer['store_id'])->first();
+        $shopify = app(Client::class, ['store' => $store]);
+        $product = $shopify->getProductWithGraphQl($offer['product_id']);
+
+        return response()->json([
+            'error' => false,
+            'data' => [
+                'offer' => $offer,
+                'product' => $product,
+            ]
+        ]);
     }
 }

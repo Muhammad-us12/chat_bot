@@ -5,8 +5,11 @@ namespace Tests\Feature;
 use App\Clients\Shopify\Client;
 use App\Events\OfferReceivedEvent;
 use App\Models\Customer;
+use App\Models\Offer;
 use App\Models\Store;
+use App\Models\TagDiscount;
 use App\Models\VariantDiscount;
+use Database\Factories\VariantDiscountFactory;
 use Facades\Tests\Fake\Shopify;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -26,6 +29,33 @@ class OfferControllerGraphQlTest extends TestCase
         $productFakeResponse = ['product' => Shopify::productWithGraphQl()];
         $variantFakeResponse = ['productVariant' => Shopify::variantWithGraphQl()];
         $customerFakeResponse = ['customerCreate' => Shopify::customerWithGraphQl()];
+        
+        Http::fake([
+            '*graphql.json' => Http::sequence()
+                ->push(['data' => $productFakeResponse], 200)
+                ->push(['data' => $variantFakeResponse], 200)
+                ->push(['data' => $customerFakeResponse], 200)
+                ->push(['data' =>  $productFakeResponse,], 200)
+        ]);
+       
+        $product = Shopify::fakeProductForCreateOfferWithGraphQl();
+        $varient = Shopify::fakeVariantForCreateOfferWithGraphQl();
+        $store = Store::factory()->create(['name' => 'usamaasgharstore.myshopify.com','access_token'=>'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']);
+        $payload = ['username' => 'usama', 'email' => 'usama@gmail.com', 'variant_offered_amount' => 200, 'variant_actual_amount' => 2629.95, 'variant_id' => $product['variants']['edges'][0]['node']['id'], 'product_id' => $product['id'], 'browser' => 'Google Chrome', 'operating_system' => 'Windows', 'store_name' => $store['name'], 'variant_name' => 'RangRover121', 'product_name' => 'RangRover'];
+
+        $response = $this->actingAs($store)->post('api/offer-graphQl', $payload);
+        $customer_shop = Customer::first();
+        $this->assertDatabaseHas('customers', ['name' => 'usama', 'email' => 'usama@gmail.com', 'shopify_id' =>$customer_shop['shopify_id'] ]);
+        $this->assertDatabaseHas('offers', ['customer_id' => Customer::first()['id'], 'variant_id' => $product['variants']['edges'][0]['node']['id'], 'variant_name' => $varient['title'], 'product_id' => $product['id'], 'variant_offered_amount' => $payload['variant_offered_amount'], 'variant_actual_amount' => $payload['variant_actual_amount']]);
+        $response->assertStatus(200);
+        $this->assertEquals('Your offer has been created successfully', $response['message']);
+    }
+
+    public function testIfTheOfferedPriceLiesInVariantDiscountValueThenOfferIsAutomaticallyApproved()
+    {
+        $productFakeResponse = ['product' => Shopify::productWithGraphQl()];
+        $variantFakeResponse = ['productVariant' => Shopify::variantWithGraphQl()];
+        $customerFakeResponse = ['customerCreate' => Shopify::customerWithGraphQl()];
         $priceRuleFakeResponse = ['priceRuleCreate' => Shopify::priceRuleWithGraphQl()];
         
         Http::fake([
@@ -35,20 +65,19 @@ class OfferControllerGraphQlTest extends TestCase
                 ->push(['data' => $customerFakeResponse], 200)
                 ->push(['data' => $priceRuleFakeResponse,], 200)
         ]);
-       
 
+        $product = Shopify::fakeProductForCreateOfferWithGraphQl();
+        $varient = Shopify::fakeVariantForCreateOfferWithGraphQl();
+        $store = Store::factory()->create(['name' => 'usamaasgharstore.myshopify.com','access_token'=>'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']);
+        
         VariantDiscount::create([
             'variant_id' => '44091188215965',
             'discount_percentage' => 5
         ]);
 
-        $product = Shopify::fakeProductForCreateOfferWithGraphQl();
-        $varient = Shopify::fakeVariantForCreateOfferWithGraphQl();
-        $store = Store::factory()->create(['name' => 'usamaasgharstore.myshopify.com','access_token'=>'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']);
         $payload = ['username' => 'usama', 'email' => 'usama@gmail.com', 'variant_offered_amount' => 200, 'variant_actual_amount' => 2629.95, 'variant_id' => $product['variants']['edges'][0]['node']['id'], 'product_id' => $product['id'], 'browser' => 'Google Chrome', 'operating_system' => 'Windows', 'store_name' => $store['name'], 'variant_name' => 'RangRover121', 'product_name' => 'RangRover'];
 
         $response = $this->actingAs($store)->post('api/offer-graphQl', $payload);
-
         $customer_shop = Customer::first();
         $this->assertDatabaseHas('customers', ['name' => 'usama', 'email' => 'usama@gmail.com', 'shopify_id' =>$customer_shop['shopify_id'] ]);
         $this->assertDatabaseHas('offers', ['customer_id' => Customer::first()['id'], 'variant_id' => $product['variants']['edges'][0]['node']['id'], 'variant_name' => $varient['title'], 'product_id' => $product['id'], 'variant_offered_amount' => $payload['variant_offered_amount'], 'variant_actual_amount' => $payload['variant_actual_amount']]);
@@ -56,7 +85,7 @@ class OfferControllerGraphQlTest extends TestCase
         $this->assertEquals('Your offer has been accepted', $response['message']);
     }
 
-    public function testUserCreateNewOfferOnProductWithTagDiscountGraphQl()
+    public function testIfTheProductHasTagThatTheStoreOwnerHasAlreadyListedThenOfferIsAutomaticallyApproved()
     {
         $productFakeResponse = ['product' => Shopify::productWithGraphQl()];
         $variantFakeResponse = ['productVariant' => Shopify::variantWithGraphQl()];
@@ -69,6 +98,7 @@ class OfferControllerGraphQlTest extends TestCase
                 ->push(['data' => $variantFakeResponse], 200)
                 ->push(['data' => $customerFakeResponse], 200)
                 ->push(['data' =>  $productFakeResponse,], 200)
+                ->push(['data' =>  $priceRuleFakeResponse,], 200)
         ]);
 
         $product = Shopify::fakeProductForCreateOfferWithGraphQl();
@@ -76,13 +106,14 @@ class OfferControllerGraphQlTest extends TestCase
         $store = Store::factory()->create(['name' => 'usamaasgharstore.myshopify.com','access_token'=>'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']);
         $payload = ['username' => 'usama', 'email' => 'usama@gmail.com', 'variant_offered_amount' => 200, 'variant_actual_amount' => 2629.95, 'variant_id' => $product['variants']['edges'][0]['node']['id'], 'product_id' => $product['id'], 'browser' => 'Google Chrome', 'operating_system' => 'Windows', 'store_name' => $store['name'], 'variant_name' => 'RangRover121', 'product_name' => 'RangRover'];
 
+        $productId = (int) substr($product['id'], strpos($product['id'], 't/') + 2);
+        TagDiscount::factory()->create(['product_id' => $productId, 'discount_percentage' => 10, 'tag_name' => 'Winter']);
         $response = $this->actingAs($store)->post('api/offer-graphQl', $payload);
-
         $customer_shop = Customer::first();
         $this->assertDatabaseHas('customers', ['name' => 'usama', 'email' => 'usama@gmail.com', 'shopify_id' =>$customer_shop['shopify_id'] ]);
         $this->assertDatabaseHas('offers', ['customer_id' => Customer::first()['id'], 'variant_id' => $product['variants']['edges'][0]['node']['id'], 'variant_name' => $varient['title'], 'product_id' => $product['id'], 'variant_offered_amount' => $payload['variant_offered_amount'], 'variant_actual_amount' => $payload['variant_actual_amount']]);
         $response->assertStatus(200);
-        $this->assertEquals('Your offer has been created successfully', $response['message']);
+        $this->assertEquals('Your offer has been accepted', $response['message']);
     }
 
     public function testErrorIsThrownIfRequiredFieldsAreLeftEmpty()
@@ -142,5 +173,40 @@ class OfferControllerGraphQlTest extends TestCase
         });
     }
 
+    public function testGetAllOffers()
+    {
+        $store = Store::factory()->create(['name' => 'usamaasgharstore.myshopify.com']);
+        Offer::factory(2)->create();
+        $response = $this->actingAs($store)->get('offers');
+        $responseData = $response->json();
+
+        $this->assertFalse($responseData['error']);
+        $this->assertArrayHasKey('data', $responseData);
+        $this->assertArrayHasKey('offers', $responseData['data']);
+    }
+
+    public function testGetOfferOnProductVariant()
+    {
+        $store = Store::factory()->create(['name' => 'usamaasgharstore.myshopify.com']);
+        $productFakeResponse = ['product' => Shopify::productWithGraphQl()];
+       
+        Http::fake([
+            '*graphql.json' => Http::sequence()
+                ->push(['data' => $productFakeResponse], 200)
+                ->push(['data' => $productFakeResponse], 200)
+        ]);
+
+        $customer = Customer::factory()->create(['store_id' => $store['id']]);
+        $product = Shopify::productWithGraphQl();
+        $offer = Offer::factory()->create(['customer_id' => $customer['id'], 'variant_id' => $product['variants']['edges'][0]['node']['id'], 'product_id' => $product['id'], 'variant_offered_amount' => 200, 'variant_actual_amount' => 230, 'status' => 'pending','store_id'=>$store['id']]);
+        
+        $response = $this->actingAs($store)->get("offers/{$offer['id']}");
+        
+        $responseData = $response->json();
+        $this->assertFalse($responseData['error']);
+        $this->assertArrayHasKey('data', $responseData);
+        $this->assertArrayHasKey('offer', $responseData['data']);
+        $this->assertArrayHasKey('product', $responseData['data']);
+    }
     
 }

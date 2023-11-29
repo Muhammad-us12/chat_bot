@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
 class Offer extends Model
 {
+    use HasFactory;
     protected $fillable = ['customer_id', 'variant_id', 'variant_name', 'product_name', 'product_id', 'store_id', 'variant_offered_amount', 'variant_actual_amount', 'status'];
 
     public function customer()
@@ -32,7 +34,7 @@ class Offer extends Model
 
     public function approve()
     {
-        $this->status = 'accepted';
+        $this->status = 'Approved';
         $this->enable_offer = 1;
         $this->save();
     }
