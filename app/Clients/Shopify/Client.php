@@ -26,12 +26,13 @@ class Client
         ])->acceptJson()->retry(3, 30)->throw()->baseUrl($baseUrl);
     }
 
-    public function getClientVersion(){
+    public function getClientVersion()
+    {
         return $this->version;
     }
 
     public function getVariant(string $variantId): array
-    {   
+    {
         return $this->http->get("/variants/{$variantId}.json")->json('variant');
     }
 
@@ -42,17 +43,17 @@ class Client
 
     public function createCustomer($customer): array
     {
-        return $this->http->post("unstable/customers.json",['customer'=>$customer])->json('customer');
+        return $this->http->post("unstable/customers.json", ['customer' => $customer])->json('customer');
     }
 
     public function createPriceRule($priceRule)
     {
-        return $this->http->post("price_rules.json",['price_rule'=>$priceRule])->json('price_rule');   
+        return $this->http->post("price_rules.json", ['price_rule' => $priceRule])->json('price_rule');
     }
 
-    public function createDiscountCode($priceRuleId,$discountCodePayloads)
+    public function createDiscountCode($priceRuleId, $discountCodePayloads)
     {
-        return $this->http->post("price_rules/{$priceRuleId}/discount_codes.json",['discount_code'=>$discountCodePayloads])->json('discount_code');   
+        return $this->http->post("price_rules/{$priceRuleId}/discount_codes.json", ['discount_code' => $discountCodePayloads])->json('discount_code');
     }
 
     public static function fetchAccessToken(string $shopAddress, string $code): array
@@ -111,7 +112,6 @@ class Client
                 'callbackUrl' => $webhook['node']['endpoint']['callbackUrl'],
             ];
         }, $webhookSubscriptions);
-
     }
 
     public function createWebhookSubscription(string $topic, string $callbackUrl): string
@@ -162,7 +162,7 @@ class Client
           }
         ';
         $variables = \compact('id');
-        
+
         return $this->http->post('/graphql.json', \compact('query', 'variables'))->json('data.webhookSubscriptionDelete.deletedWebhookSubscriptionId') == $id;
     }
 
@@ -179,12 +179,12 @@ class Client
     public function getProductWithGraphQl(string $productId): array
     {
         $getProductQuery = new GetAProduct($productId);
-        
+
         return $this->graphQlRequestExecute($getProductQuery);
     }
 
     public function getVariantWithGraphQl(string $variantId): array
-    {   
+    {
         $getProductVariantQuery = new GetProductVariant($variantId);
 
         return $this->graphQlRequestExecute($getProductVariantQuery);
@@ -197,11 +197,15 @@ class Client
         return $this->graphQlRequestExecute($createCustomerQuery);
     }
 
-    public function createPriceRuleAndGetDiscountCodeGraphQl($value, $variantId, $customerShopifyId){
-        $priceRuleQuery = new CreatePriceRuleAndGetDiscountCode($value,$variantId,$customerShopifyId);
-        
+    public function createPriceRuleAndGetDiscountCodeGraphQl($value, $variantId, $customerShopifyId)
+    {
+        $priceRuleQuery = new CreatePriceRuleAndGetDiscountCode($value, $variantId, $customerShopifyId);
+
         return $this->graphQlRequestExecute($priceRuleQuery);
     }
 
-    
+    public function getVariantIdFromGraphQlID($variantId)
+    {
+        return (int)substr($variantId, strpos($variantId, "t/") + 2);
+    }
 }

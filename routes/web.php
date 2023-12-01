@@ -4,7 +4,7 @@ use App\Http\Controllers\BargainController;
 use App\Http\Controllers\DiscountController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OAuthController;
-use App\Http\Controllers\OfferControllerGraphQl;
+use App\Http\Controllers\OfferController;
 use App\Http\Controllers\PriceBeatController;
 use App\Http\Controllers\Product\ProductGroupController;
 
@@ -19,8 +19,9 @@ Route::group(['middleware' => ['shopify.auth']], function () {
     Route::post('variant-discount/{variant}', [DiscountController::class, 'store']);
 
     // Offers Routes
-    Route::get('offers', [OfferControllerGraphQl::class,'getAllOffers']);
-    Route::get('offers/{offer}', [OfferControllerGraphQl::class,'getOffer']);
+    Route::get('offers', [OfferController::class, 'getAllOffers']);
+    Route::get('offers/{offer}', [OfferController::class, 'getOffer']);
+    Route::get('offer-accept/{offer}', [OfferController::class, 'acceptOffer']);
 });
 
 Route::view('/login', 'login')->name('auth.login');

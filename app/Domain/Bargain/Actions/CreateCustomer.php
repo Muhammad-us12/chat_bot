@@ -11,17 +11,16 @@ class CreateCustomer
 {
     public function __construct(private IpLocation $ipLocate)
     {
-       
     }
 
-    public function execute(Store $store, string $name, string $email, string $ip,$customerShopifyId = null,$offerCounter = 0): Customer
+    public function execute(Store $store, string $name, string $email, string $ip, $customerShopifyId = null, $offerCounter = 0): Customer
     {
         $customer = $store->customers()->where('email', $email)->first();
         if ($customer) {
             return $customer;
         }
         $os = $this->getCustomerOs();
-        
+
         $customerLocationInfo = $this->ipLocate->getLocation($ip);
         return $store->customers()->save(new Customer([
             'country' => $customerLocationInfo['country'] ?? null,
