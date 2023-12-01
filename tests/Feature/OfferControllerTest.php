@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Domain\Bargain\Entities\Bargain;
+use App\Events\OfferApprovedEvent;
+use App\Events\OfferDeniedEvent;
 use Facades\App\Clients\Shopify\Client;
 use App\Events\OfferReceivedEvent;
 use App\Models\Customer;
@@ -258,9 +260,7 @@ class OfferControllerTest extends TestCase
         $productFakeResponse = ['product' => Shopify::productWithGraphQl()];
 
         Http::fake([
-            '*graphql.json' => Http::sequence()
-                ->push(['data' => $productFakeResponse], 200)
-                ->push(['data' => $productFakeResponse], 200)
+            '*graphql.json' =>  Http::response(['data' => $productFakeResponse])
         ]);
 
         $customer = Customer::factory()->create(['store_id' => $store['id']]);
@@ -274,5 +274,61 @@ class OfferControllerTest extends TestCase
         $this->assertArrayHasKey('data', $responseData);
         $this->assertArrayHasKey('offer', $responseData['data']);
         $this->assertArrayHasKey('product', $responseData['data']);
+    }
+
+    public function testAdminAcceptOfferAndStoredDiscountCode()
+    {
+        $priceRuleFakeResponse = ['priceRuleCreate' => Shopify::priceRuleWithGraphQl()];
+
+        Http::fake([
+            '*graphql.json' =>  Http::response(['data' => $priceRuleFakeResponse])
+        ]);
+
+        $store = Store::factory()->create();
+        $customer = Customer::factory()->create(['store_id' => $store['id'], 'shopify_id' => $this->faker()->randomNumber(8)]);
+        $product = Shopify::productWithGraphQl();
+        $offer = Offer::factory()->create(['customer_id' => $customer['id'], 'variant_id' => $product['variants']['edges'][0]['node']['id'], 'product_id' => $product['id'], 'variant_offered_amount' => $this->faker()->randomNumber(3), 'variant_actual_amount' => $this->faker()->randomNumber(3), 'status' => 'pending']);
+
+        $response = $this->actingAs($store)->get("offer-accept/{$offer['id']}");
+
+        $responseData = $response->json();
+        $varaintId = Client::getVariantIdFromGraphQlID($offer['variant_id']);
+        $this->assertDatabaseHas('discount_codes', ['variant_id' => $varaintId, 'code' => $responseData['data']['discountCode']]);
+        $this->assertEquals('Offer has been Approved successfully', $response['message']);
+    }
+
+    public function testAnEventForSendingMailWasDispatachedOnApprovalOffer()
+    {
+        Event::fake();
+        $email = $this->faker()->email();
+        $code = $this->faker()->randomNumber(4);
+        $fakeUrl = $this->faker()->url();
+        event(new OfferApprovedEvent($email, $code, $fakeUrl));
+
+        Event::assertDispatched(OfferApprovedEvent::class, function ($event) use ($email, $code, $fakeUrl) {
+            return $event->email === $email && $event->code == $code;
+        });
+    }
+
+    public function testAdminDeniedOffer()
+    {
+        $store = Store::factory()->create();
+        $customer = Customer::factory()->create(['store_id' => $store['id'], 'shopify_id' => $this->faker()->randomNumber(8)]);
+        $product = Shopify::productWithGraphQl();
+        $offer = Offer::factory()->create(['customer_id' => $customer['id'], 'variant_id' => $product['variants']['edges'][0]['node']['id'], 'product_id' => $product['id'], 'variant_offered_amount' => $this->faker()->randomNumber(3), 'variant_actual_amount' => $this->faker()->randomNumber(3), 'status' => 'pending']);
+
+        $response = $this->actingAs($store)->get("offer-deny/{$offer['id']}");
+        $this->assertEquals('Offer Denied Successfully', $response['message']);
+    }
+
+    public function testAnEventForSendingMailWasDispatachedOnDeniedOffer()
+    {
+        Event::fake();
+        $email = $this->faker()->email();
+        event(new OfferDeniedEvent($email));
+
+        Event::assertDispatched(OfferDeniedEvent::class, function ($event) use ($email) {
+            return $event->email === $email;
+        });
     }
 }

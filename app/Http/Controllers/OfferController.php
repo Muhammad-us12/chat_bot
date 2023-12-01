@@ -9,6 +9,7 @@ use App\Models\Store;
 use App\Models\Offer;
 use App\Models\Customer;
 use App\Domain\Bargain\Entities\Bargain;
+use App\Events\OfferDeniedEvent;
 use App\Events\OfferReceivedEvent;
 use Domain\Bargain\Actions\OfferActions;
 use Domain\Bargain\Entities\Product;
@@ -115,8 +116,6 @@ class OfferController extends Controller
         return false;
     }
 
-
-
     public function getPercentageValue($actualAmount, $discountPercentage)
     {
         $ratio = $discountPercentage / 100;
@@ -124,8 +123,6 @@ class OfferController extends Controller
 
         return $actualAmount - $percentageValue;
     }
-
-
 
     public function getAllOffers()
     {
@@ -152,5 +149,34 @@ class OfferController extends Controller
                 'product' => $product,
             ]
         ]);
+    }
+
+    public function acceptOffer(Offer $offer, Client $shopify, Request $request)
+    {
+        $store = $request->get('store');
+        $shopify = app(Client::class, ['store' => $store]);
+        $OfferActions = new OfferActions;
+        $discountCode = $OfferActions->ApprovedOffer($offer, $shopify, $store);
+        if ($discountCode) {
+            return response()->json([
+                'error' => false,
+                'message' => 'Offer has been Approved successfully',
+                'data' => [
+                    'discountCode' => $discountCode
+                ]
+            ], 200);
+        }
+    }
+
+    public function denyOffer(Offer $offer, Request $request)
+    {
+        if ($offer['status'] === 'pending') {
+            event(new OfferDeniedEvent($offer['customer']['email']));
+            $offer->deny($request);
+
+            return response()->json(['error' => false, 'message' => 'Offer Denied Successfully']);
+        }
+
+        return response()->json(['error' => true, 'message' => 'You can not perform this action']);
     }
 }

@@ -3,6 +3,7 @@
 namespace Domain\Bargain\Actions;
 
 use App\Clients\Shopify\Client;
+use App\Events\OfferApprovedEvent;
 use App\Models\DiscountCode;
 use App\Models\Offer;
 
@@ -24,10 +25,10 @@ class OfferActions
             $this->storeDiscountCode($offer, $priceRuleData['priceRuleDiscountCode']['code']);
             $discountCode = $priceRuleData['priceRuleDiscountCode']['code'];
             $url = env('APP_URL') . '/checkout?product=' . $offer['product_name'] . '&variant=' . $offer['variant_name'] . '&shop=' . $store['name'] . '&code=' . $discountCode . '&customerId=' . $customer['id'];
-            // event(new OfferApprovedEvent($customer['email'], $priceRule['code'], $url));
+            event(new OfferApprovedEvent($customer['email'], $discountCode, $url));
             $offer->approve();
 
-            return true;
+            return $discountCode;
         }
     }
 

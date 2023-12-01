@@ -18,6 +18,8 @@ Route::group(['middleware' => ['shopify.auth']], function () {
     // Offers Routes
     Route::get('offers', [OfferController::class, 'getAllOffers']);
     Route::get('offers/{offer}', [OfferController::class, 'getOffer']);
+    Route::get('offer-accept/{offer}', [OfferController::class, 'acceptOffer']);
+    Route::get('offer-deny/{offer}', [OfferController::class, 'denyOffer']);
 });
 
 Route::view('/login', 'login')->name('auth.login');
