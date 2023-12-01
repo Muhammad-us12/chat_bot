@@ -15,13 +15,9 @@ Route::group(['middleware' => ['shopify.auth']], function () {
     Route::delete('bargain/{bargain}', [BargainController::class, 'delete']);
     Route::post('price-beat-offer', [PriceBeatController::class, 'create']);
 
-    // Discounts Routes
-    Route::post('variant-discount/{variant}', [DiscountController::class, 'store']);
-
     // Offers Routes
     Route::get('offers', [OfferController::class, 'getAllOffers']);
     Route::get('offers/{offer}', [OfferController::class, 'getOffer']);
-    Route::get('offer-accept/{offer}', [OfferController::class, 'acceptOffer']);
 });
 
 Route::view('/login', 'login')->name('auth.login');

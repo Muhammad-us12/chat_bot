@@ -29,8 +29,8 @@ class OfferReceivedRequest extends FormRequest
             'email' => 'required|email',
             'variant_offered_amount' => 'required|numeric',
             'variant_actual_amount' => 'required|numeric',
-            'variant_id' => 'string|required',
-            'product_id' => 'string|required',
+            'variant_id' => 'required',
+            'product_id' => 'required',
             'browser' => 'required|string',
             'operating_system' => 'required|string',
             'store_name' => 'required|string'

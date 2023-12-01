@@ -46,96 +46,98 @@ class Shopify extends TestFaker
 
     public static function fakeProductForCreateOffer(array $attrs = []): array
     {
-        return array_merge(['id' => '13222270548386512', 'title' => 'RangRover', 'vendor' => 'robustweb', 'variants' => [['id' => '32222705483865', 'price' => 230,'title' => 'RangRover121', 'displayName' => 'Rang Rover']], 'tags' => ['OLA-Product']], $attrs);
+        return array_merge(['id' => '13222270548386512', 'title' => 'RangRover', 'vendor' => 'robustweb', 'variants' => [['id' => '32222705483865', 'price' => 230, 'title' => 'RangRover121', 'displayName' => 'Rang Rover']], 'tags' => ['OLA-Product']], $attrs);
     }
 
-    public function priceRule(){
+    public function priceRule()
+    {
         return [
-                "id" => 996606715,
-                "value_type" => "percentage",
-                "value" => "-100.0",
-                "customer_selection" => "all",
-                "target_type" => "line_item",
-                "target_selection" => "entitled",
-                "allocation_method" => "each",
-                "allocation_limit" => 3,
-                "once_per_customer" => false,
-                "usage_limit" => null,
-                "starts_at" => "2018-03-21T20:00:00-04:00",
-                "ends_at" => null,
-                "created_at" => "2023-07-11T18:37:53-04:00",
-                "updated_at" => "2023-07-11T18:37:53-04:00",
-                "entitled_product_ids" => [
-                  921728736
-                ],
-                "entitled_variant_ids" => ['32222705483865'],
-                "entitled_collection_ids" => [],
-                "entitled_country_ids" => [],
-                "prerequisite_product_ids" => [],
-                "prerequisite_variant_ids" => [],
-                "prerequisite_collection_ids" => [
-                  841564295
-                ],
-                "customer_segment_prerequisite_ids" => [],
-                "prerequisite_customer_ids" => [],
-                "prerequisite_subtotal_range" => null,
-                "prerequisite_quantity_range" => null,
-                "prerequisite_shipping_price_range" => null,
-                "prerequisite_to_entitlement_quantity_ratio" => [
-                  "prerequisite_quantity" => 2,
-                  "entitled_quantity" => 1
-                ],
-                "prerequisite_to_entitlement_purchase" => [
-                  "prerequisite_amount" => null
-                ],
-                "title" => "Buy2iPodsGetiPodTouchForFree",
-                "admin_graphql_api_id" => "gid://shopify/PriceRule/996606715"
-             ];
+            "id" => 996606715,
+            "value_type" => "percentage",
+            "value" => "-100.0",
+            "customer_selection" => "all",
+            "target_type" => "line_item",
+            "target_selection" => "entitled",
+            "allocation_method" => "each",
+            "allocation_limit" => 3,
+            "once_per_customer" => false,
+            "usage_limit" => null,
+            "starts_at" => "2018-03-21T20:00:00-04:00",
+            "ends_at" => null,
+            "created_at" => "2023-07-11T18:37:53-04:00",
+            "updated_at" => "2023-07-11T18:37:53-04:00",
+            "entitled_product_ids" => [
+                921728736
+            ],
+            "entitled_variant_ids" => ['32222705483865'],
+            "entitled_collection_ids" => [],
+            "entitled_country_ids" => [],
+            "prerequisite_product_ids" => [],
+            "prerequisite_variant_ids" => [],
+            "prerequisite_collection_ids" => [
+                841564295
+            ],
+            "customer_segment_prerequisite_ids" => [],
+            "prerequisite_customer_ids" => [],
+            "prerequisite_subtotal_range" => null,
+            "prerequisite_quantity_range" => null,
+            "prerequisite_shipping_price_range" => null,
+            "prerequisite_to_entitlement_quantity_ratio" => [
+                "prerequisite_quantity" => 2,
+                "entitled_quantity" => 1
+            ],
+            "prerequisite_to_entitlement_purchase" => [
+                "prerequisite_amount" => null
+            ],
+            "title" => "Buy2iPodsGetiPodTouchForFree",
+            "admin_graphql_api_id" => "gid://shopify/PriceRule/996606715"
+        ];
     }
 
     public function Customer()
     {
         return [
-            'id' => 1073339467,
-            'email' => 'usama@gmail.com',
-            'accepts_marketing' => false,
-            'created_at' => '2023-10-03T13:36:34-04:00',
-            'updated_at' => '2023-10-03T13:36:34-04:00',
-            'first_name' => 'usama',
-            'last_name' => '',
+            'id' => $this->faker()->randomNumber(8),
+            'email' => $this->faker()->email,
+            'accepts_marketing' => $this->faker()->boolean,
+            'created_at' => $this->faker()->dateTime(),
+            'updated_at' => $this->faker()->dateTime(),
+            'first_name' => $this->faker()->firstName(),
+            'last_name' => $this->faker()->lastName(),
             'orders_count' => 0,
-            'state' => 'enabled',
+            'state' => $this->faker()->randomElements(['enabled', 'disabled'], 1)[0],
             'total_spent' => '0.00',
             'last_order_id' => NULL,
             'note' => NULL,
-            'verified_email' => true,
+            'verified_email' => $this->faker()->boolean,
             'multipass_identifier' => NULL,
-            'tax_exempt' => false,
+            'tax_exempt' => $this->faker()->boolean,
             'tags' => '',
             'last_order_name' => NULL,
-            'currency' => 'USD',
-            'phone' => '+15142546011',
+            'currency' => $this->faker()->currencyCode(),
+            'phone' => $this->faker()->phoneNumber(),
             'addresses' => [],
-            'accepts_marketing_updated_at' => '2023-10-03T13:36:34-04:00',
+            'accepts_marketing_updated_at' => $this->faker()->dateTime(),
             'marketing_opt_in_level' => NULL,
             'tax_exemptions' => [],
             'email_marketing_consent' => [
                 'state' => 'not_subscribed',
                 'opt_in_level' => 'single_opt_in',
                 'consent_updated_at' => NULL,
-                ],
+            ],
             'sms_marketing_consent' => [
                 'state' => 'not_subscribed',
                 'opt_in_level' => 'single_opt_in',
                 'consent_updated_at' => NULL,
                 'consent_collected_from' => 'OTHER',
-                ],
-            'admin_graphql_api_id' => 'gid://shopify/Customer/1073339467',
+            ],
+            'admin_graphql_api_id' => 'gid://shopify/Customer/' . $this->faker()->randomNumber(8),
             'default_address' => [],
-          ];
+        ];
     }
 
-    public function DiscountCodeWithRestApi(){
+    public function DiscountCodeWithRestApi()
+    {
         return [
             "id" => 1054381139,
             "price_rule_id" => 996606715,
@@ -146,66 +148,60 @@ class Shopify extends TestFaker
         ];
     }
 
-    public function productWithGraphQl(){
-        return [
-                "id" => "gid://shopify/Product/7847013154973",
-                "title" => "The 3p Fulfilled Snowboard",
-                "handle" => "the-3p-fulfilled-snowboard",
-                "vendor" => "UsamaAsgharStore",
-                "tags" => ["Accessory","Sport","Winter"],
-                "variants" => [
-                    "edges" => [
-                        [
-                            "node"=>[
-                                "id" => "gid://shopify/ProductVariant/44091188215965",
-                                "displayName" => "The 3p Fulfilled Snowboard - Default Title",
-                                "price" => "2629.95",
-                            ]
+    public function productWithGraphQl(array $attrs = [])
+    {
+        return array_merge([
+            "id" => 'gid://shopify/Product/' . $this->faker()->randomNumber(8),
+            "title" => $this->faker()->word(10),
+            "handle" => $this->faker()->word(15),
+            "vendor" => $this->faker()->name,
+            "tags" => [$this->faker()->word(5), $this->faker()->word(10), $this->faker()->word(5)],
+            "variants" => [
+                "edges" => [
+                    [
+                        "node" => [
+                            "id" => 'gid://shopify/ProductVariant/' . $this->faker()->randomNumber(8),
+                            "displayName" => $this->faker()->word(10),
+                            "price" => $this->faker()->randomNumber(3),
                         ]
                     ]
                 ]
-            ];
+            ]
+        ], $attrs);
     }
 
-    public function variantWithGraphQl(){
-        return [
-            "id" => "gid://shopify/ProductVariant/44091188215965",
-            "title"=> "Default Title",
-            "price" => '2629.95',
+    public function variantWithGraphQl(array $attrs = [])
+    {
+        return array_merge([
+            "id" => 'gid://shopify/ProductVariant/' . $this->faker()->randomNumber(8),
+            "title" => $this->faker()->word(10),
+            "price" => $this->faker()->randomNumber(3),
             "product" => [
-                "id"=> "gid://shopify/Product/7847013154973"
+                "id" => $this->faker()->randomNumber(8),
             ],
-        ];
+        ], $attrs);
     }
 
-    public function customerWithGraphQl(){
+    public function customerWithGraphQl()
+    {
         return [
             "customer" => [
-                "id" => "gid://shopify/Customer/6808641241245",
-                "email"=> "usamaas@gmail.com",
+                "id" => "gid://shopify/Customer/" . $this->faker()->randomNumber(8),
+                "email" => $this->faker()->email,
             ]
         ];
     }
 
-    public function priceRuleWithGraphQl(){
+    public function priceRuleWithGraphQl()
+    {
         return [
             "priceRule" => [
-                "id" => "gid://shopify/PriceRule/1074339741853",
+                "id" => "gid://shopify/PriceRule/" . $this->faker()->randomNumber(8),
             ],
             "priceRuleDiscountCode" => [
-                "id" => "gid://shopify/PriceRuleDiscountCode/14258988089501",
-                "code" => "2343"
+                "id" => "gid://shopify/PriceRuleDiscountCode/" . $this->faker()->randomNumber(8),
+                "code" => $this->faker()->randomNumber(4)
             ]
         ];
-    }
-
-    public static function fakeVariantForCreateOfferWithGraphQl(array $attrs = []): array
-    {
-        return array_merge(['id' => 'gid://shopify/ProductVariant/44091188215965', 'title' => 'Default Title', 'price' => 230, 'product' => ['id' => 'gid://shopify/Product/7847013154973']], $attrs);
-    }
-
-    public static function fakeProductForCreateOfferWithGraphQl(array $attrs = []): array
-    {
-        return array_merge(['id' => 'gid://shopify/Product/7847013154973', 'title' => 'RangRover', 'vendor' => 'robustweb', 'variants' => ['edges' => [['node' => ['id' => 'gid://shopify/ProductVariant/44091188215965', 'price' => 230, 'displayName' => 'Rang Rover']]]], 'tags' => ['OLA-Product']], $attrs);
     }
 }

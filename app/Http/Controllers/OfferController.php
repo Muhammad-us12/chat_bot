@@ -48,6 +48,7 @@ class OfferController extends Controller
                 return response()->json(['error' => false, 'message' => 'Your offer has been created successfully'], 200);
             }
 
+
             if ($this->autoPriceCheck($request['variant_offered_amount'], $request['variant_actual_amount'], $bargainData)) {
                 $OfferActions = new OfferActions;
                 if ($OfferActions->ApprovedOffer($offer, $shopify, $store)) {
@@ -102,11 +103,11 @@ class OfferController extends Controller
     public function autoPriceCheck($offeredAmount, $actualAmount, $bargainData)
     {
         if ($bargainData->type == 'fixed') {
-            if ($offeredAmount <= ($actualAmount - $bargainData->value)) {
+            if ($offeredAmount >= ($actualAmount - $bargainData->value)) {
                 return true;
             }
         } else {
-            if ($offeredAmount <= $this->getPercentageValue($actualAmount, $bargainData->value)) {
+            if ($offeredAmount >= $this->getPercentageValue($actualAmount, $bargainData->value)) {
                 return true;
             }
         }
