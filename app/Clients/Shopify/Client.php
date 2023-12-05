@@ -41,6 +41,13 @@ class Client
         return $this->http->get("/products/{$productId}.json")->json('product');
     }
 
+    public function getAllProduct(): array
+    {
+        return $this->http->get("products.json")->json('products');
+        return $this->http->get("pages.json")->json('products');
+        
+    }
+
     public function createCustomer($customer): array
     {
         return $this->http->post("unstable/customers.json", ['customer' => $customer])->json('customer');
@@ -176,36 +183,7 @@ class Client
         return $this->http->post("graphql.json", ['query' => "$query"])->json();
     }
 
-    public function getProductWithGraphQl(string $productId): array
-    {
-        $getProductQuery = new GetAProduct($productId);
+ 
 
-        return $this->graphQlRequestExecute($getProductQuery);
-    }
-
-    public function getVariantWithGraphQl(string $variantId): array
-    {
-        $getProductVariantQuery = new GetProductVariant($variantId);
-
-        return $this->graphQlRequestExecute($getProductVariantQuery);
-    }
-
-    public function createCustomerWithGraphQl($email): array
-    {
-        $createCustomerQuery = new createACustomer($email);
-
-        return $this->graphQlRequestExecute($createCustomerQuery);
-    }
-
-    public function createPriceRuleAndGetDiscountCodeGraphQl($value, $variantId, $customerShopifyId)
-    {
-        $priceRuleQuery = new CreatePriceRuleAndGetDiscountCode($value, $variantId, $customerShopifyId);
-
-        return $this->graphQlRequestExecute($priceRuleQuery);
-    }
-
-    public function getVariantIdFromGraphQlID($variantId)
-    {
-        return (int)substr($variantId, strpos($variantId, "t/") + 2);
-    }
+   
 }
